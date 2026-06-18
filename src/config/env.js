@@ -1,6 +1,8 @@
 require("dotenv").config();
 const { z } = require("zod");
 
+const optionalUrl = z.preprocess((value) => (value === "" ? undefined : value), z.string().url().optional());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().default(5000),
@@ -16,11 +18,11 @@ const envSchema = z.object({
   ZOOM_ACCOUNT_ID: z.string().optional(),
   ZOOM_CLIENT_ID: z.string().optional(),
   ZOOM_CLIENT_SECRET: z.string().optional(),
-  SUPPORT_CHAT_URL: z.string().url().optional(),
-  SALES_PANEL_URL: z.string().url().optional(),
-  TRAINER_PANEL_URL: z.string().url().optional(),
-  DIETICIAN_PANEL_URL: z.string().url().optional(),
-  SUPPORT_PANEL_URL: z.string().url().optional(),
+  SUPPORT_CHAT_URL: optionalUrl,
+  SALES_PANEL_URL: optionalUrl,
+  TRAINER_PANEL_URL: optionalUrl,
+  DIETICIAN_PANEL_URL: optionalUrl,
+  SUPPORT_PANEL_URL: optionalUrl,
   SUPPORT_HOURS: z.string().default("10:00-19:00 IST")
 });
 
