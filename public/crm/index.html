@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bhawani Fitness CRM</title>
+    <link rel="stylesheet" href="/crm/styles.css?v=20260605-3" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <span>BF</span>
+        <div>
+          <strong>Bhawani Fitness</strong>
+          <small>Central CRM</small>
+        </div>
+      </div>
+      <nav>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#leads">Leads</a>
+        <a href="#blogs">Blogs</a>
+        <a href="#finance">Finance</a>
+        <a href="#support">Support</a>
+        <a href="#activity">Activity</a>
+      </nav>
+      <div class="login-card">
+        <small>Demo staff login</small>
+        <strong>superadmin@yoga.test</strong>
+        <span>SuperAdmin@123</span>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Management Workspace</p>
+          <h1>CRM Control Center</h1>
+        </div>
+        <div class="status">
+          <span id="apiStatus">Checking API...</span>
+          <button id="refreshBtn">Refresh</button>
+        </div>
+      </header>
+
+      <section class="panel login-panel" id="loginPanel">
+        <div>
+          <p class="eyebrow">Staff Access</p>
+          <h2>Open CRM</h2>
+          <p>Login with the seeded admin account to test protected CRM data.</p>
+          <p class="session-status" id="sessionStatus">Not logged in</p>
+        </div>
+        <form id="loginForm">
+          <input type="email" name="email" value="superadmin@yoga.test" placeholder="Email" required />
+          <input type="password" name="password" value="SuperAdmin@123" placeholder="Password" required />
+          <button type="submit">Login to CRM</button>
+          <button type="button" id="logoutBtn" class="secondary-btn hidden">Logout</button>
+        </form>
+      </section>
+
+      <section class="grid stats" id="dashboard">
+        <article>
+          <small>Total Users</small>
+          <strong id="totalUsers">-</strong>
+        </article>
+        <article>
+          <small>Total Leads</small>
+          <strong id="totalLeads">-</strong>
+        </article>
+        <article>
+          <small>Conversion Rate</small>
+          <strong id="conversionRate">-</strong>
+        </article>
+        <article>
+          <small>Revenue</small>
+          <strong id="revenue">-</strong>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Lead Test</p>
+            <h2>Create Website Lead Manually</h2>
+          </div>
+        </div>
+        <form class="lead-form" id="leadForm">
+          <input type="text" name="name" value="Demo Client" placeholder="Client name" required />
+          <input type="tel" name="phone" value="7726060202" placeholder="WhatsApp number" required />
+          <select name="concern">
+            <option>Female Fertility</option>
+            <option>Male Fertility</option>
+            <option>Pregnancy Support</option>
+            <option>PCOS / PCOD</option>
+            <option>Low AMH</option>
+            <option>Blocked Tubes</option>
+          </select>
+          <textarea name="journey" placeholder="Client notes">Client asked for fertility consultation from CRM demo.</textarea>
+          <button type="submit" id="createTestLead">Save Lead to CRM</button>
+        </form>
+        <p class="muted">This confirms website/app enquiry data is saving in the same backend database.</p>
+      </section>
+
+      <section class="panel" id="leads">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Sales Pipeline</p>
+            <h2>Latest Leads</h2>
+          </div>
+          <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="NEW">New</option>
+            <option value="CONTACTED">Contacted</option>
+            <option value="HOT">Hot</option>
+            <option value="COLD">Cold</option>
+            <option value="CONVERTED">Converted</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Concern</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Action</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="leadRows">
+              <tr><td colspan="7">Login to load leads.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="blogs">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Website CMS</p>
+            <h2>Blogs Management</h2>
+          </div>
+          <select id="blogStatusFilter">
+            <option value="">All Blogs</option>
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
+          </select>
+        </div>
+        <form class="blog-form" id="blogForm">
+          <input type="text" name="title" placeholder="Blog title" required />
+          <input type="text" name="category" placeholder="Category" value="Fertility" required />
+          <select name="status">
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Publish</option>
+          </select>
+          <textarea name="excerpt" placeholder="Short excerpt"></textarea>
+          <textarea name="content" placeholder="Full blog content" required></textarea>
+          <button type="submit">Save Blog</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="blogRows">
+              <tr><td colspan="4">Login to load blogs.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="grid two">
+        <article class="panel" id="finance">
+          <p class="eyebrow">Finance</p>
+          <h2>Payment & Invoice Scope</h2>
+          <ul>
+            <li>Payment received / pending tracking</li>
+            <li>Quotation, proforma invoice and invoice flow</li>
+            <li>WhatsApp/email sending points documented</li>
+            <li>Month-end CA export planned</li>
+          </ul>
+        </article>
+        <article class="panel" id="support">
+          <p class="eyebrow">Support</p>
+          <h2>Support Scope</h2>
+          <ul>
+            <li>User issue history endpoint available</li>
+            <li>Ticket status tracking</li>
+            <li>Human chat support only</li>
+            <li>No AI chatbot and no recordings</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel" id="activity">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Audit</p>
+            <h2>CRM Test Log</h2>
+          </div>
+        </div>
+        <pre id="logBox">Ready.</pre>
+      </section>
+    </main>
+
+    <script src="/crm/app.js?v=20260605-3"></script>
+  </body>
+</html>

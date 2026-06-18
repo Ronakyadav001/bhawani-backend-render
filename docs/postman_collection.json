@@ -1,0 +1,857 @@
+{
+  "info": {
+    "name": "Yoga Wellness Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5050/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "planId",
+      "value": "monthly-wellness"
+    },
+    {
+      "key": "providerOrderId",
+      "value": ""
+    },
+    {
+      "key": "onboardingCallId",
+      "value": ""
+    },
+    {
+      "key": "dieticianId",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "ticketId",
+      "value": ""
+    },
+    {
+      "key": "salesToken",
+      "value": ""
+    },
+    {
+      "key": "trainerToken",
+      "value": ""
+    },
+    {
+      "key": "dieticianToken",
+      "value": ""
+    },
+    {
+      "key": "supportToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Config - App Config",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/app-config"
+      }
+    },
+    {
+      "name": "Auth - User App Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login/user",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@yoga.test\",\n  \"password\": \"User@123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Auth - Staff Panel Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login/staff",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"trainer@yoga.test\",\n  \"password\": \"Trainer@123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Auth - Login User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@yoga.test\",\n  \"password\": \"User@123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.token) {",
+              "  pm.collectionVariables.set('token', json.data.token);",
+              "  pm.collectionVariables.set('userId', json.data.user.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Me",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "Subscriptions - Plans",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/subscriptions/plans"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.plans && json.data.plans.length) {",
+              "  pm.collectionVariables.set('planId', json.data.plans[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions - Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": \"{{planId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.payment) {",
+              "  pm.collectionVariables.set('providerOrderId', json.data.payment.providerOrderId);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions - Verify Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/payments/verify",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"providerOrderId\": \"{{providerOrderId}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Subscriptions - Active",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/me"
+      }
+    },
+    {
+      "name": "Subscriptions - My History",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/me/history"
+      }
+    },
+    {
+      "name": "Admin - Payments",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/payments"
+      }
+    },
+    {
+      "name": "Admin - Subscriptions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/subscriptions/admin"
+      }
+    },
+    {
+      "name": "Leads - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/leads",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"New Lead\",\n  \"phone\": \"9888888888\",\n  \"email\": \"lead@example.com\",\n  \"source\": \"Instagram\",\n  \"notes\": \"Interested in quarterly plan\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Leads - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/leads"
+      }
+    },
+    {
+      "name": "Onboarding - Schedule",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/onboarding-calls",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"scheduledAt\": \"2026-05-09T10:00:00.000Z\",\n  \"meetingLink\": \"https://meet.google.com/demo-yoga-call\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.call) {",
+              "  pm.collectionVariables.set('onboardingCallId', json.data.call.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Onboarding - Update Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/onboarding-calls/{{onboardingCallId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Diet - Assign Dietician",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/assignments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"dieticianId\": \"{{dieticianId}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Diet - Create Plan",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/plans",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"title\": \"Starter Yoga Diet\",\n  \"startDate\": \"2026-05-09T00:00:00.000Z\",\n  \"endDate\": \"2026-05-16T00:00:00.000Z\",\n  \"meals\": [\n    {\n      \"dayOfWeek\": 1,\n      \"mealType\": \"breakfast\",\n      \"title\": \"Oats and fruit\",\n      \"calories\": 350\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Diet - My Plans",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/plans/me"
+      }
+    },
+    {
+      "name": "Sessions - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Morning Yoga Flow\",\n  \"category\": \"Beginner\",\n  \"startTime\": \"2026-05-09T06:00:00.000Z\",\n  \"durationMin\": 45\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.session) {",
+              "  pm.collectionVariables.set('sessionId', json.data.session.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sessions - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions"
+      }
+    },
+    {
+      "name": "Sessions - Update Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions/{{sessionId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"LIVE\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Sessions - Join",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions/{{sessionId}}/join"
+      }
+    },
+    {
+      "name": "Support - Chat Assistance",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/support/chat",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"I need help changing my diet plan\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Support - Tickets",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/support/tickets"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.tickets && json.data.tickets.length) {",
+              "  pm.collectionVariables.set('ticketId', json.data.tickets[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications - Mine",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/notifications"
+      }
+    },
+    {
+      "name": "Admin - Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/dashboard"
+      }
+    },
+    {
+      "name": "Diet - Create Compliance",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/compliance",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dietPlanId\": \"DIET_PLAN_ID\",\n  \"followed\": true,\n  \"mealsFollowed\": 3,\n  \"notes\": \"Followed today\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Diet - Compliance List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/compliance"
+      }
+    },
+    {
+      "name": "Diet - Create Progress",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/progress",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"weightKg\": 67.5,\n  \"energyLevel\": 8,\n  \"sleepHours\": 7,\n  \"notes\": \"Feeling better\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Diet - Progress List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/diet/progress"
+      }
+    },
+    {
+      "name": "Trainer - Assigned Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions/trainer/users"
+      }
+    },
+    {
+      "name": "Trainer - Analytics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/sessions/trainer/analytics"
+      }
+    },
+    {
+      "name": "Admin - Sales Analytics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/sales-analytics"
+      }
+    },
+    {
+      "name": "Support - User History",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/support/users/{{userId}}/history"
+      }
+    },
+    {
+      "name": "Users - Save Consent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/me/consents",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"HEALTH_DATA\",\n  \"accepted\": true,\n  \"version\": \"1.0\",\n  \"source\": \"postman\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Users - My Consents",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/me/consents"
+      }
+    },
+    {
+      "name": "Users - Create Privacy Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/me/privacy-requests",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"DATA_EXPORT\",\n  \"reason\": \"Please export my account data.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Support - Privacy Requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/privacy-requests"
+      }
+    },
+    {
+      "name": "Support - Update Privacy Request",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/privacy-requests/{{privacyRequestId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"resolution\": \"Handled by support.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Notifications - Delivery Logs",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/notifications/delivery-logs"
+      }
+    },
+    {
+      "name": "Users - My Data Export",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users/me/data-export"
+      }
+    },
+    {
+      "name": "Admin - Compliance Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/compliance-summary"
+      }
+    }
+  ]
+}

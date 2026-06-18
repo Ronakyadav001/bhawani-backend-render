@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bhawani Fitness Role Interfaces</title>
+    <link rel="stylesheet" href="/interfaces/styles.css?v=20260606-2" />
+  </head>
+  <body>
+    <aside>
+      <div class="brand">
+        <span>BF</span>
+        <div>
+          <strong>Bhawani Fitness</strong>
+          <small>Backend Role Interfaces</small>
+        </div>
+      </div>
+      <nav>
+        <button data-panel="client">Client Login</button>
+        <button data-panel="trainer">Trainer Panel</button>
+        <button data-panel="dietician">Dietician Panel</button>
+        <button data-panel="support">Support Panel</button>
+      </nav>
+      <p class="hint">These screens use real backend APIs and seeded demo roles.</p>
+    </aside>
+
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Live Backend Demo</p>
+          <h1 id="pageTitle">Client Login Interface</h1>
+        </div>
+        <div class="health">
+          <span id="healthStatus">Checking API...</span>
+          <button id="refreshBtn">Refresh</button>
+        </div>
+      </header>
+
+      <section class="hero panel">
+        <div>
+          <p class="eyebrow" id="roleLabel">USER INTERFACE</p>
+          <h2 id="heroTitle">Client app login and personal wellness data</h2>
+          <p id="heroCopy">Shows how a client logs in and accesses their subscription, diet, progress, support chat and sessions from the app backend.</p>
+        </div>
+        <form id="loginForm">
+          <input type="email" name="email" />
+          <input type="password" name="password" />
+          <button type="submit">Login & Load Interface</button>
+        </form>
+      </section>
+
+      <section class="grid" id="cards"></section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Actions</p>
+            <h2 id="actionsTitle">Client backend actions</h2>
+          </div>
+        </div>
+        <div class="actions" id="actions"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">API Response</p>
+            <h2>Working log</h2>
+          </div>
+        </div>
+        <pre id="logBox">Ready.</pre>
+      </section>
+    </main>
+
+    <script src="/interfaces/app.js?v=20260606-2"></script>
+  </body>
+</html>

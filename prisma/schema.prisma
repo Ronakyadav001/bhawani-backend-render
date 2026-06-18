@@ -1,0 +1,530 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  SALES_ADMIN
+  YOGA_TRAINER
+  DIETICIAN
+  SUPPORT_ADMIN
+  USER
+}
+
+enum SubscriptionDuration {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum OnboardingStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  RESCHEDULED
+}
+
+enum SessionType {
+  LIVE
+}
+
+enum AttendanceStatus {
+  JOINED
+  MISSED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ChatSenderType {
+  USER
+  SUPPORT_ADMIN
+  DIETICIAN
+  YOGA_TRAINER
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+enum ConsentType {
+  TERMS
+  PRIVACY
+  MARKETING
+  HEALTH_DATA
+}
+
+enum PrivacyRequestType {
+  DATA_EXPORT
+  DATA_DELETION
+  DATA_CORRECTION
+}
+
+enum PrivacyRequestStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String?  @unique
+  phone        String?  @unique
+  passwordHash String?
+  role         Role     @default(USER)
+  isActive     Boolean  @default(true)
+  profilePic   String?
+  fcmToken     String?
+
+  age           Int?
+  gender        String?
+  heightCm      Float?
+  weightKg      Float?
+  goal          String?
+  activityLevel String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments                 Payment[]
+  subscriptions            UserSubscription[]
+  onboardingCalls          OnboardingCall[]       @relation("UserOnboarding")
+  scheduledOnboardingCalls OnboardingCall[]       @relation("SalesScheduledCalls")
+  trainerSessions          LiveSession[]          @relation("TrainerSessions")
+  dietPlansCreated         DietPlan[]             @relation("DietPlansCreated")
+  dietPlansAssigned        DietPlan[]             @relation("DietPlansAssigned")
+  dietComplianceEntries    DietComplianceEntry[]
+  progressEntries          ProgressEntry[]
+  assignedDieticianUsers   DieticianAssignment[]  @relation("AssignedDietician")
+  assignedUserDieticians   DieticianAssignment[]  @relation("AssignedUser")
+  attendances              SessionAttendance[]
+  chatMessages             ChatMessage[]
+  supportTickets           SupportTicket[]        @relation("TicketUser")
+  assignedTickets          SupportTicket[]        @relation("TicketAssignee")
+  notifications            Notification[]
+  consents                 UserConsent[]
+  privacyRequests          PrivacyRequest[]
+  feedbacks                Feedback[]
+  activityLogs             ActivityLog[]
+
+  @@index([role])
+}
+
+model SubscriptionPlan {
+  id               String               @id @default(uuid())
+  name             String
+  description      String?
+  duration         SubscriptionDuration
+  price            Decimal              @db.Decimal(10, 2)
+  yogaSessions     Int
+  hasDietician     Boolean              @default(true)
+  hasLiveClasses   Boolean              @default(true)
+  features         String[]
+  isActive         Boolean              @default(true)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  payments      Payment[]
+  subscriptions UserSubscription[]
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  userId            String
+  planId            String
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("INR")
+  status            PaymentStatus @default(PENDING)
+  provider          String        @default("RAZORPAY")
+  providerOrderId   String?       @unique
+  providerPaymentId String?       @unique
+  providerSignature String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model UserSubscription {
+  id        String             @id @default(uuid())
+  userId    String
+  planId    String
+  paymentId String?
+  status    SubscriptionStatus @default(ACTIVE)
+  startDate DateTime           @default(now())
+  endDate   DateTime
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId, status])
+}
+
+model Lead {
+  id          String   @id @default(uuid())
+  name        String
+  email       String?
+  phone       String
+  source      String   @default("WEBSITE")
+  status      String   @default("NEW")
+  intent      String?
+  concern     String?
+  journey     String?
+  page        String?
+  notes       String?
+  country     String?
+  city        String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  referrer    String?
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([source, status])
+  @@index([createdAt])
+  @@index([concern])
+}
+
+model OnboardingCall {
+  id            String           @id @default(uuid())
+  userId        String
+  scheduledById String?
+  scheduledAt   DateTime
+  status        OnboardingStatus @default(SCHEDULED)
+  meetingLink   String?
+  notes         String?
+  reminderSentAt DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user        User  @relation("UserOnboarding", fields: [userId], references: [id], onDelete: Cascade)
+  scheduledBy User? @relation("SalesScheduledCalls", fields: [scheduledById], references: [id])
+
+  @@index([userId, status])
+}
+
+model DieticianAssignment {
+  id          String   @id @default(uuid())
+  userId      String
+  dieticianId String
+  assignedBy  String?
+  isActive    Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User @relation("AssignedUser", fields: [userId], references: [id], onDelete: Cascade)
+  dietician User @relation("AssignedDietician", fields: [dieticianId], references: [id])
+
+  @@index([userId, isActive])
+  @@index([dieticianId, isActive])
+}
+
+model DietPlan {
+  id          String   @id @default(uuid())
+  userId      String
+  dieticianId String
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User       @relation("DietPlansAssigned", fields: [userId], references: [id], onDelete: Cascade)
+  dietician User       @relation("DietPlansCreated", fields: [dieticianId], references: [id])
+  meals     DietMeal[]
+  complianceEntries DietComplianceEntry[]
+
+  @@index([userId, isActive])
+  @@index([dieticianId])
+}
+
+model DietComplianceEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  dietPlanId  String
+  date        DateTime
+  followed    Boolean
+  mealsFollowed Int?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dietPlanId, date])
+  @@index([userId, date])
+}
+
+model ProgressEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  date        DateTime
+  weightKg    Float?
+  energyLevel Int?
+  sleepHours  Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model DietMeal {
+  id            String   @id @default(uuid())
+  dietPlanId    String
+  dayOfWeek     Int
+  mealType      String
+  title         String
+  calories      Int?
+  proteinGrams  Int?
+  carbsGrams    Int?
+  fatsGrams     Int?
+  instructions  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dietPlanId, dayOfWeek])
+}
+
+model LiveSession {
+  id          String      @id @default(uuid())
+  trainerId   String
+  title       String
+  category    String
+  type        SessionType @default(LIVE)
+  startTime   DateTime
+  durationMin Int
+  liveLink    String?
+  zoomMeetingId String?
+  zoomStartUrl  String?
+  zoomJoinUrl   String?
+  status      String      @default("SCHEDULED")
+  reminderSentAt DateTime?
+  liveNotifiedAt DateTime?
+  missedProcessedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  trainer     User                @relation("TrainerSessions", fields: [trainerId], references: [id])
+  attendances SessionAttendance[]
+
+  @@index([trainerId, startTime])
+  @@index([startTime])
+}
+
+model SessionAttendance {
+  id                String           @id @default(uuid())
+  sessionId         String
+  userId            String
+  status            AttendanceStatus @default(JOINED)
+  joinedAt          DateTime?
+  leftAt            DateTime?
+  durationAttended  Int              @default(0)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([userId, status])
+}
+
+model ChatMessage {
+  id          String         @id @default(uuid())
+  userId      String
+  senderId    String?
+  senderType  ChatSenderType
+  message     String
+  createdAt   DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model SupportTicket {
+  id          String       @id @default(uuid())
+  userId      String
+  assignedToId String?
+  subject     String
+  description String
+  status      TicketStatus @default(OPEN)
+  priority    String       @default("NORMAL")
+  resolution  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user       User  @relation("TicketUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedTo User? @relation("TicketAssignee", fields: [assignedToId], references: [id])
+
+  @@index([status])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  channel   String   @default("IN_APP")
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
+
+  @@index([userId, isRead])
+}
+
+model NotificationDelivery {
+  id             String         @id @default(uuid())
+  notificationId String
+  channel        String
+  provider       String
+  status         DeliveryStatus @default(PENDING)
+  attempts       Int            @default(0)
+  maxAttempts    Int            @default(3)
+  nextAttemptAt  DateTime?
+  lastAttemptAt  DateTime?
+  response       Json?
+  error          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt])
+  @@index([notificationId])
+}
+
+model UserConsent {
+  id        String      @id @default(uuid())
+  userId    String
+  type      ConsentType
+  accepted  Boolean     @default(true)
+  version   String      @default("1.0")
+  source    String?
+  ipAddress String?
+  acceptedAt DateTime   @default(now())
+  revokedAt  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, version])
+  @@index([userId, type])
+}
+
+model PrivacyRequest {
+  id          String               @id @default(uuid())
+  userId      String
+  type        PrivacyRequestType
+  status      PrivacyRequestStatus @default(OPEN)
+  reason      String?
+  resolution  String?
+  requestedAt DateTime             @default(now())
+  resolvedAt  DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([type, status])
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  step      String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, step])
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  category    String
+  excerpt     String?
+  content     String
+  coverImage  String?
+  status      String   @default("DRAFT")
+  authorName  String   @default("Bhawani Fitness Team")
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([category])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  role      Role?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
+}
