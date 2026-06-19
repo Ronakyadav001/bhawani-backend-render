@@ -122,6 +122,8 @@ POST /sessions
 PATCH /sessions/:id
 GET /sessions/trainer/users
 GET /sessions/trainer/analytics
+GET /sessions/recordings
+POST /sessions/:id/recordings
 POST /sessions/:id/join
 POST /sessions/:id/leave
 GET /sessions/:id/attendance
@@ -138,9 +140,9 @@ PATCH /support/tickets/:id
 GET /support/users/:userId/history
 ```
 
-`POST /support/chat` stores normal chat-assistance messages. Support tickets are created explicitly with `POST /support/tickets`.
+`GET /sessions/recordings` returns active session recordings for subscribed users and trainer/admin roles, categorized by session date, trainer, and yoga category. Trainers can upload recording links with `POST /sessions/:id/recordings`.
 
-Chat support is human/staff chat by design for the current scope. AI auto-resolution and session recordings are intentionally excluded.
+`POST /support/chat` stores chat-assistance messages. If automated assistance cannot resolve a user issue, `POST /support/tickets` creates the escalation ticket for the Support Team Panel.
 
 ## Notifications, Feedback, Admin Analytics
 

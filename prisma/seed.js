@@ -295,6 +295,21 @@ async function main() {
     }
   });
 
+  await prisma.sessionRecording.upsert({
+    where: { id: "demo-session-recording" },
+    update: {
+      sessionId: liveSession.id,
+      isActive: true
+    },
+    create: {
+      id: "demo-session-recording",
+      sessionId: liveSession.id,
+      title: "Daily Fertility Yoga Session Recording",
+      recordingUrl: "https://meet.google.com/demo-yoga-session-recording",
+      thumbnailUrl: "https://dummyimage.com/640x360/0f4327/ffffff&text=Bhawani+Yoga+Recording"
+    }
+  });
+
   await prisma.supportTicket.upsert({
     where: { id: "demo-open-support-ticket" },
     update: {

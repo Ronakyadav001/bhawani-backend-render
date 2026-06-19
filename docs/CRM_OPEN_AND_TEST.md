@@ -41,5 +41,5 @@ Password: SuperAdmin@123
 
 - CRM is served from the same Node backend.
 - Website/app enquiries save in the same `Lead` table.
-- Human support is kept as chat/support workflow only.
-- No AI chatbot and no recordings are included.
+- Chat support, escalation tickets, and issue history are available through backend APIs.
+- Session recording links are tracked through the session recording APIs.

@@ -16,7 +16,7 @@ const panels = {
     copy: "Schedule live yoga sessions, manage session links, monitor attendance and review trainer-side performance analytics.",
     email: "trainer@yoga.test",
     password: "Trainer@123",
-    cards: ["Total Sessions", "Upcoming Sessions", "Assigned Users", "Attendance Rate"],
+    cards: ["Total Sessions", "Upcoming Sessions", "Attendance Rate", "Recordings"],
     tableTitle: "Live session schedule"
   },
   dietician: {
@@ -160,7 +160,8 @@ function renderActions() {
       ["Load Trainer Dashboard", loadTrainerDashboard],
       ["Create Live Session", createTrainerSession],
       ["View Assigned Users", trainerUsers],
-      ["Attendance Report", attendanceReport]
+      ["Attendance Report", attendanceReport],
+      ["Upload Recording", uploadRecording]
     ],
     dietician: [
       ["Load Diet Dashboard", loadDietDashboard],
@@ -326,16 +327,17 @@ async function viewPayments() {
 }
 
 async function loadTrainerDashboard() {
-  const [analytics, sessions] = await Promise.all([
+  const [analytics, sessions, recordings] = await Promise.all([
     api("/api/v1/sessions/trainer/analytics"),
-    api("/api/v1/sessions")
+    api("/api/v1/sessions"),
+    api("/api/v1/sessions/recordings")
   ]);
   const ownSessions = (sessions.sessions || []).filter((session) => session.trainer?.id === user.id);
   if (ownSessions[0]) lastSessionId = ownSessions[0].id;
   setCard(0, analytics.totalSessions || 0);
   setCard(1, analytics.upcomingSessions || 0);
-  setCard(2, analytics.joined || 0);
-  setCard(3, `${analytics.attendanceRate || 0}%`);
+  setCard(2, `${analytics.attendanceRate || 0}%`);
+  setCard(3, recordings.recordings?.length || 0);
   setRows(["Session", "Category", "Status", "Start Time"], ownSessions.slice(0, 8).map((session) => [
     session.title,
     session.category,
@@ -362,7 +364,6 @@ async function createTrainerSession() {
 
 async function trainerUsers() {
   const data = await api("/api/v1/sessions/trainer/users");
-  setCard(2, `${data.users?.length || 0}`);
   setRows(["Client", "Attended", "Missed", "Last Session"], (data.users || []).map((row) => [
     row.user?.name,
     row.sessionsAttended,
@@ -370,6 +371,24 @@ async function trainerUsers() {
     row.lastSession?.title
   ]));
   write("Assigned users loaded", data);
+}
+
+async function uploadRecording() {
+  if (!lastSessionId) await loadTrainerDashboard();
+  if (!lastSessionId) {
+    write("Create a live session before uploading a recording.");
+    return;
+  }
+  const data = await api(`/api/v1/sessions/${lastSessionId}/recordings`, {
+    method: "POST",
+    body: JSON.stringify({
+      title: `Recording ${new Date().toLocaleTimeString()}`,
+      recordingUrl: "https://meet.google.com/demo-yoga-session-recording",
+      thumbnailUrl: "https://dummyimage.com/640x360/0f4327/ffffff&text=Bhawani+Yoga+Recording"
+    })
+  });
+  write("Session recording uploaded", data.recording);
+  await loadTrainerDashboard();
 }
 
 async function attendanceReport() {

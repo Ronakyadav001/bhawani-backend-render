@@ -56,7 +56,7 @@ async function createZoomMeeting({ title, startTime, durationMin }) {
         join_before_host: false,
         waiting_room: true,
         approval_type: 2,
-        auto_recording: "none"
+        auto_recording: "cloud"
       }
     })
   });
