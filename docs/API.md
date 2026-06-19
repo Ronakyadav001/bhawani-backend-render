@@ -122,8 +122,6 @@ POST /sessions
 PATCH /sessions/:id
 GET /sessions/trainer/users
 GET /sessions/trainer/analytics
-GET /sessions/recordings
-POST /sessions/:id/recordings
 POST /sessions/:id/join
 POST /sessions/:id/leave
 GET /sessions/:id/attendance
@@ -140,9 +138,9 @@ PATCH /support/tickets/:id
 GET /support/users/:userId/history
 ```
 
-`GET /sessions/recordings` returns active session recordings for subscribed users and trainer/admin roles, categorized by session date, trainer, and yoga category. Trainers can upload recording links with `POST /sessions/:id/recordings`.
-
 `POST /support/chat` stores chat-assistance messages. If automated assistance cannot resolve a user issue, `POST /support/tickets` creates the escalation ticket for the Support Team Panel.
+
+Session recordings and automatic recording storage are intentionally out of the active backend scope.
 
 ## Notifications, Feedback, Admin Analytics
 

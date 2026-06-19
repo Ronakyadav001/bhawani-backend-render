@@ -42,4 +42,4 @@ Password: SuperAdmin@123
 - CRM is served from the same Node backend.
 - Website/app enquiries save in the same `Lead` table.
 - Chat support, escalation tickets, and issue history are available through backend APIs.
-- Session recording links are tracked through the session recording APIs.
+- Zoom recording and session recording storage are intentionally removed from the active scope.

@@ -353,26 +353,9 @@ model LiveSession {
 
   trainer     User                @relation("TrainerSessions", fields: [trainerId], references: [id])
   attendances SessionAttendance[]
-  recordings  SessionRecording[]
 
   @@index([trainerId, startTime])
   @@index([startTime])
-}
-
-model SessionRecording {
-  id           String   @id @default(uuid())
-  sessionId    String
-  title        String
-  recordingUrl String
-  thumbnailUrl String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId])
-  @@index([isActive, createdAt])
 }
 
 model SessionAttendance {

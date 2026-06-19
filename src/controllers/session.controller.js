@@ -15,12 +15,6 @@ const sessionSchema = z.object({
   status: z.string().optional()
 });
 
-const recordingSchema = z.object({
-  title: z.string().min(2),
-  recordingUrl: z.string().url(),
-  thumbnailUrl: z.string().url().optional()
-});
-
 async function hasActiveSubscription(userId) {
   const subscription = await prisma.userSubscription.findFirst({
     where: { userId, status: "ACTIVE", endDate: { gt: new Date() } }
@@ -77,79 +71,6 @@ const listSessions = asyncHandler(async (req, res) => {
     orderBy: { startTime: "asc" }
   });
   sendSuccess(res, "Sessions fetched", { sessions });
-});
-
-const createSessionRecording = asyncHandler(async (req, res) => {
-  const data = recordingSchema.parse(req.body);
-  const session = await prisma.liveSession.findUnique({ where: { id: req.params.id } });
-  if (!session) throw new ApiError(404, "Session not found");
-  if (req.user.role === "YOGA_TRAINER" && session.trainerId !== req.user.id) {
-    throw new ApiError(403, "You can only upload recordings for your own sessions");
-  }
-
-  const recording = await prisma.sessionRecording.create({
-    data: {
-      sessionId: session.id,
-      title: data.title,
-      recordingUrl: data.recordingUrl,
-      thumbnailUrl: data.thumbnailUrl
-    },
-    include: {
-      session: {
-        select: {
-          id: true,
-          title: true,
-          category: true,
-          startTime: true,
-          trainer: { select: { id: true, name: true } }
-        }
-      }
-    }
-  });
-
-  await logActivity({
-    actor: req.user,
-    action: "SESSION_RECORDING_UPLOADED",
-    entity: "SessionRecording",
-    entityId: recording.id,
-    metadata: { sessionId: session.id }
-  });
-
-  sendSuccess(res, "Session recording uploaded", { recording }, 201);
-});
-
-const listRecordings = asyncHandler(async (req, res) => {
-  if (req.user.role === "USER" && !(await hasActiveSubscription(req.user.id))) {
-    throw new ApiError(403, "Active subscription required to access session recordings");
-  }
-
-  const where = { isActive: true };
-  if (req.user.role === "YOGA_TRAINER") {
-    where.session = { trainerId: req.user.id };
-  }
-  if (req.query.category) {
-    where.session = { ...(where.session || {}), category: req.query.category };
-  }
-
-  const recordings = await prisma.sessionRecording.findMany({
-    where,
-    include: {
-      session: {
-        select: {
-          id: true,
-          title: true,
-          category: true,
-          startTime: true,
-          durationMin: true,
-          trainer: { select: { id: true, name: true } }
-        }
-      }
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100
-  });
-
-  sendSuccess(res, "Session recordings fetched", { recordings });
 });
 
 const joinSession = asyncHandler(async (req, res) => {
@@ -278,9 +199,7 @@ const trainerAnalytics = asyncHandler(async (req, res) => {
 
 module.exports = {
   createSession,
-  createSessionRecording,
   listSessions,
-  listRecordings,
   joinSession,
   leaveSession,
   updateSession,
