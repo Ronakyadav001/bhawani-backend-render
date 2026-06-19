@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bhawani Fitness Role Interfaces</title>
-    <link rel="stylesheet" href="/interfaces/styles.css?v=20260606-2" />
+    <title>Bhawani Fitness Admin Panels</title>
+    <link rel="stylesheet" href="/interfaces/styles.css?v=20260619-1" />
   </head>
   <body>
     <aside>
@@ -12,40 +12,49 @@
         <span>BF</span>
         <div>
           <strong>Bhawani Fitness</strong>
-          <small>Backend Role Interfaces</small>
+          <small>Admin Panels</small>
         </div>
       </div>
       <nav>
-        <button data-panel="client">Client Login</button>
-        <button data-panel="trainer">Trainer Panel</button>
+        <button data-panel="sales">Sales Team Panel</button>
+        <button data-panel="trainer">Yoga Trainer Panel</button>
         <button data-panel="dietician">Dietician Panel</button>
-        <button data-panel="support">Support Panel</button>
+        <button data-panel="support">Support Team Panel</button>
       </nav>
-      <p class="hint">These screens use real backend APIs and seeded demo roles.</p>
+      <div class="side-note">
+        <strong>SRS coverage</strong>
+        <span>Subscription, onboarding, diet, live session, attendance, support, and activity tracking workflows.</span>
+      </div>
     </aside>
 
     <main>
       <header>
         <div>
-          <p class="eyebrow">Live Backend Demo</p>
-          <h1 id="pageTitle">Client Login Interface</h1>
+          <p class="eyebrow">Live Backend Admin Workspace</p>
+          <h1 id="pageTitle">Sales Team Panel</h1>
         </div>
         <div class="health">
           <span id="healthStatus">Checking API...</span>
-          <button id="refreshBtn">Refresh</button>
+          <button id="refreshBtn" type="button">Refresh</button>
         </div>
       </header>
 
       <section class="hero panel">
         <div>
-          <p class="eyebrow" id="roleLabel">USER INTERFACE</p>
-          <h2 id="heroTitle">Client app login and personal wellness data</h2>
-          <p id="heroCopy">Shows how a client logs in and accesses their subscription, diet, progress, support chat and sessions from the app backend.</p>
+          <p class="eyebrow" id="roleLabel">Sales Operations</p>
+          <h2 id="heroTitle">Lead, subscription and onboarding control</h2>
+          <p id="heroCopy">Manage enquiry flow, payment/subscription visibility, mandatory onboarding calls and conversion analytics from one admin view.</p>
         </div>
         <form id="loginForm">
-          <input type="email" name="email" />
-          <input type="password" name="password" />
-          <button type="submit">Login & Load Interface</button>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" autocomplete="username" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password" autocomplete="current-password" />
+          </label>
+          <button type="submit">Login to Panel</button>
         </form>
       </section>
 
@@ -54,8 +63,8 @@
       <section class="panel">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Actions</p>
-            <h2 id="actionsTitle">Client backend actions</h2>
+            <p class="eyebrow">Panel Actions</p>
+            <h2 id="actionsTitle">Sales Team Panel Actions</h2>
           </div>
         </div>
         <div class="actions" id="actions"></div>
@@ -64,14 +73,30 @@
       <section class="panel">
         <div class="section-head">
           <div>
-            <p class="eyebrow">API Response</p>
-            <h2>Working log</h2>
+            <p class="eyebrow">Operational View</p>
+            <h2 id="tableTitle">Sales pipeline</h2>
+          </div>
+          <span class="pill" id="loginState">Not logged in</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel audit-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Activity Tracking</p>
+            <h2>Action audit</h2>
           </div>
         </div>
         <pre id="logBox">Ready.</pre>
       </section>
     </main>
 
-    <script src="/interfaces/app.js?v=20260606-2"></script>
+    <script src="/interfaces/app.js?v=20260619-1"></script>
   </body>
 </html>
