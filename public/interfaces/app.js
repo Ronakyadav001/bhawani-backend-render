@@ -63,7 +63,6 @@ const els = {
   tableHead: document.getElementById("tableHead"),
   tableBody: document.getElementById("tableBody"),
   loginState: document.getElementById("loginState"),
-  log: document.getElementById("logBox"),
   health: document.getElementById("healthStatus"),
   refresh: document.getElementById("refreshBtn")
 };
@@ -78,8 +77,11 @@ function formatDate(value) {
 }
 
 function write(message, payload) {
-  const extra = payload ? `\n${JSON.stringify(payload, null, 2)}` : "";
-  els.log.textContent = `[${new Date().toLocaleTimeString()}] ${message}${extra}\n\n${els.log.textContent}`;
+  if (payload) {
+    console.info(message, payload);
+  } else {
+    console.info(message);
+  }
 }
 
 async function api(path, options = {}) {
